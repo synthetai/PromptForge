@@ -42,7 +42,7 @@ pip install -r requirements.txt
    ```
 
 3. **Modify the Configuration File**  
-   After downloading the model, update the `config.py` file to specify the local model path:
+   After downloading the model, update the `app/config.py` file to specify the local model path:
    ```python
    # Model Configuration
    MODEL_NAME = "/workspace/Qwen2.5-VL-7B-Instruct"
