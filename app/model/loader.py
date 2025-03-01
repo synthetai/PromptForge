@@ -1,6 +1,6 @@
 import torch
 from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
-from config import MODEL_NAME, DEVICE
+from app.config import MODEL_NAME, DEVICE
 
 def load_model_and_processor():
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained(

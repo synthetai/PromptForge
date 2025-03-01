@@ -1,21 +1,28 @@
 import gradio as gr
 from app.processing.image_processor import process_image
-from app.config import CUSTOM_TEMP_DIR
 
 def create_interface():
-    return gr.Interface(
-        fn=process_image,
-        inputs=[
-            gr.Image(type="filepath", label="Upload Image"),
-            gr.Textbox(label="Enter Prompt", placeholder="Describe this image.")
-        ],
-        outputs=gr.Textbox(label="Model Output"),
-        title="Qwen-VL Image Description",
-        description="Upload an image and enter a prompt to get a description from the Qwen-VL model.",
-        examples=[
-            ["path/to/example/image1.jpg", "Describe this image."],
-            ["path/to/example/image2.jpg", "What's happening in this picture?"]
-        ],
-        cache_examples=True,
-        tempdir=CUSTOM_TEMP_DIR
-    )
+    def handle_image_and_prompt(image, prompt, target_language):
+        if image is None:
+            return "Please upload an image."
+        enhanced_prompt = process_image(image, prompt, target_language)
+        return enhanced_prompt
+
+    with gr.Blocks(title="PromptForge") as interface:
+        gr.Markdown("# PromptForge")
+        gr.Markdown("Upload an image, enter a prompt, and select the target language for prompt enhancement.")
+        
+        image_input = gr.Image(type="filepath", label="Upload Image")
+        prompt_input = gr.Textbox(label="Prompt", placeholder="Describe this image.")
+        language_input = gr.Radio(["CH", "EN"], label="Target language of prompt enhance", value="CH")
+        
+        output = gr.Textbox(label="Prompt Enhance Output")
+        
+        gr.Interface(
+            fn=handle_image_and_prompt,
+            inputs=[image_input, prompt_input, language_input],
+            outputs=output,
+            live=False  # 这确保只有在提交时才会处理
+        )
+
+    return interface

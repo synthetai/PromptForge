@@ -1,7 +1,7 @@
 import os
 
 # 模型配置
-MODEL_NAME = "Qwen/Qwen2.5-VL-7B-Instruct"
+MODEL_NAME = "/workspace/Qwen2.5-VL-7B-Instruct"
 
 # 文件路径配置
 CUSTOM_TEMP_DIR = "/tmp/qwen-vl"

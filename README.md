@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**PromptForge** is an open-source tool designed to optimize and extend prompts for image and video generation. Users simply input an image and a related prompt, and PromptForge utilizes advanced large-model techniques to optimize these prompts, generating more accurate and efficient prompts. Whether for image generation or video generation, PromptForge helps creators improve both efficiency and quality.
+**PromptForge** is an open-source tool designed to optimize and extend prompts for image and video generation. Users simply input an image and a related prompt, and PromptForge utilizes advanced large-model techniques to optimize these prompts, generating more accurate and efficient outputs. Whether for image generation or video generation, PromptForge helps creators improve both efficiency and quality.
 
 ## Features
 
@@ -25,18 +25,35 @@ cd PromptForge
 pip install -r requirements.txt
 ```
 
-## Usage
+### Additional Installation Steps
 
-1. **Prepare Input Files**: Prepare an image and a related video generation prompt.
-2. **Run the Optimization Program**:
+1. **Install System Dependencies**  
+   The project was tested on Ubuntu 22.04 with CUDA version 12.2. Install the following packages on your operating system:
+   ```bash
+   apt-get update && apt-get install -y git libgl1 libglib2.0-0 sox libsox-dev ffmpeg
+   pip install --no-cache-dir torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+   ```
 
-```bash
+2. **Download the Model**  
+   Install the Hugging Face CLI tool and download the model:
+   ```bash
+   pip install "huggingface_hub[cli]"
+   huggingface-cli download Qwen/Qwen2.5-VL-7B-Instruct --local-dir ./Qwen2.5-VL-7B-Instruct
+   ```
 
-```
+3. **Modify the Configuration File**  
+   After downloading the model, update the `config.py` file to specify the local model path:
+   ```python
+   # Model Configuration
+   MODEL_NAME = "/workspace/Qwen2.5-VL-7B-Instruct"
+   ```
 
-1. **Get the Optimized Prompts**: After running the command, the system will output the optimized prompts.
+4. **Start the Program**  
+   
+   ```bash
+   python main.py
+   ```
 
 ## Contact
 
 For any questions or suggestions, please contact [wezzxn@gmail.com] or raise an Issue on GitHub.
-
