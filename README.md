@@ -36,14 +36,6 @@ pip install -r requirements.txt
 
 1. **Get the Optimized Prompts**: After running the command, the system will output the optimized prompts.
 
-## Contributing
-
-We welcome contributions from the community! If you have any ideas or improvements, feel free to open Issues or submit Pull Requests. Please follow the [contribution guidelines](https://chatgpt.com/c/CONTRIBUTING.md).
-
-## License
-
-This project is licensed under the [MIT License](https://chatgpt.com/c/LICENSE).
-
 ## Contact
 
 For any questions or suggestions, please contact [wezzxn@gmail.com] or raise an Issue on GitHub.
