@@ -25,7 +25,7 @@
 2. **克隆代码仓库**
 
    ```bash
-   git clone https://github.com/yourusername/PromptForge.git
+   git clone https://github.com/synthetai/PromptForge.git
    cd PromptForge
    pip install -r requirements.txt
    ```
