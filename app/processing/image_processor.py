@@ -1,14 +1,20 @@
 import logging
 from PIL import Image
 from vllm import SamplingParams
-from qwen_vl_utils import process_vision_info  # 添加这个导入
+from qwen_vl_utils import process_vision_info
 from app.model.loader import model_manager
-from app.config import VL_CH_SYS_PROMPT, VL_EN_SYS_PROMPT, SAMPLING_CONFIG
+from app.config import VL_MODELS, VL_CH_SYS_PROMPT, VL_EN_SYS_PROMPT
 
 def process_image(image_path, prompt, target_language, model_name):
+    """处理图像和提示词"""
     try:
-        # 加载模型和processor
-        llm, processor = model_manager.load_vl_model(model_name)
+        # 通过ModelManager加载模型和processor
+        llm, processor = model_manager.load_model(
+            model_name=model_name,
+            model_type='vl',
+            model_info=VL_MODELS[model_name]  # 传递模型信息字典
+        )
+
         logging.info(f"Processing image with model {model_name}: {image_path}")
         logging.info(f"Using {target_language} system prompt")
         
@@ -60,7 +66,12 @@ def process_image(image_path, prompt, target_language, model_name):
         }
         
         # 设置采样参数
-        sampling_params = SamplingParams(**SAMPLING_CONFIG)
+        sampling_params = SamplingParams(
+            temperature=0.7,
+            top_p=0.8,
+            repetition_penalty=1.05,
+            max_tokens=512
+        )
         
         # 生成
         outputs = llm.generate([llm_inputs], sampling_params=sampling_params)

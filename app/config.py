@@ -7,13 +7,25 @@ GRADIO_SERVER_PORT = int(os.environ.get("GRADIO_SERVER_PORT", 7860))
 # VL模型配置
 VL_MODELS = {
     "Qwen2.5-VL-7B-Instruct": {
-        "model_path": "/workspace/Qwen2.5-VL-7B-Instruct",
-        "model_name": "Qwen/Qwen2.5-VL-7B-Instruct"
+        "path": "/workspace/Qwen2.5-VL-7B-Instruct",
+        "name": "Qwen/Qwen2.5-VL-7B-Instruct"
     },
     "Qwen2.5-VL-3B-Instruct": {
-        "model_path": "/workspace/Qwen2.5-VL-3B-Instruct",
-        "model_name": "Qwen/Qwen2.5-VL-3B-Instruct"
+        "path": "/workspace/Qwen2.5-VL-3B-Instruct",
+        "name": "Qwen/Qwen2.5-VL-3B-Instruct"
+    }
+}
+
+# LM模型配置
+LM_MODELS = {
+    "Qwen2.5-7B-Instruct": {
+        "path": "/workspace/Qwen2.5-7B-Instruct",
+        "name": "Qwen/Qwen2.5-7B-Instruct"
     },
+    "Qwen2.5-3B-Instruct": {
+        "path": "/workspace/Qwen2.5-3B-Instruct",
+        "name": "Qwen/Qwen2.5-3B-Instruct"
+    }
 }
 
 # 默认VL模型
@@ -75,11 +87,6 @@ Task Requirements:
 10. No matter what language the user inputs, you must always output in English.
 Directly output the rewritten English text.'''
 
-# 文本模型配置
-LM_MODELS = {
-    "Qwen2.5-7B-Instruct": "/workspace/Qwen2.5-7B-Instruct",
-    "Qwen2.5-3B-Instruct": "/workspace/Qwen2.5-3B-Instruct",
-}
 
 # System Prompts for text-only tasks
 LM_ZH_SYS_PROMPT = \

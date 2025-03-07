@@ -1,7 +1,9 @@
+import torch
+import gc
 import logging
 from vllm import LLM, SamplingParams
-from transformers import AutoProcessor
-from app.config import VL_MODELS, MODEL_CONFIGS, SAMPLING_CONFIG
+from transformers import AutoTokenizer, AutoProcessor
+from app.config import MODEL_CONFIGS
 
 class ModelManager:
     _instance = None
@@ -14,58 +16,77 @@ class ModelManager:
 
     def init_manager(self):
         """初始化管理器"""
-        self.loaded_models = {}
-        self.loaded_processors = {}
+        self.current_model = None
+        self.current_tokenizer = None
         self.current_model_name = None
+        self.model_type = None  # 'vl' or 'lm'
 
-    def load_vl_model(self, model_name):
-        """加载VL模型"""
+    def _clear_gpu_memory(self):
+        """清理GPU显存"""
+        if self.current_model is not None:
+            del self.current_model
+            self.current_model = None
+        if self.current_tokenizer is not None:
+            del self.current_tokenizer
+            self.current_tokenizer = None
+        
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            gc.collect()
+        
+        self.current_model_name = None
+        self.model_type = None
+        logging.info("Cleared GPU memory")
+
+    def load_model(self, model_name, model_type, model_info):
+        """通用模型加载函数"""
         try:
-            if model_name not in VL_MODELS:
-                raise ValueError(f"Model {model_name} not found in configured models")
-
-            if self.current_model_name != model_name:
-                logging.info(f"Loading VL model: {model_name}")
+            # 如果要加载的模型与当前模型不同，清理显存
+            if self.current_model_name != model_name or self.model_type != model_type:
+                self._clear_gpu_memory()
+                logging.info(f"Loading {model_type} model: {model_name}")
                 
+                # 获取模型配置
                 model_config = MODEL_CONFIGS["default"]
-                model_info = VL_MODELS[model_name]
                 
                 # 创建vllm实例
-                if model_name not in self.loaded_models:
-                    llm = LLM(
-                        model=model_info["model_path"],            # 本地模型路径
-                        tokenizer=model_info["model_name"],        # HF模型名称
-                        trust_remote_code=model_config["trust_remote_code"],
-                        max_model_len=model_config["max_model_len"],
-                        max_num_seqs=model_config["max_num_seqs"],
-                        gpu_memory_utilization=model_config["gpu_memory_utilization"],
-                        tensor_parallel_size=model_config["tensor_parallel_size"],
-                        dtype=model_config["dtype"],
-                        disable_mm_preprocessor_cache=model_config["disable_mm_preprocessor_cache"],
-                        mm_processor_kwargs=model_config["mm_processor_kwargs"],
-                    )
-                    self.loaded_models[model_name] = llm
-
-                # 加载processor
-                if model_name not in self.loaded_processors:
-                    processor = AutoProcessor.from_pretrained(
-                        model_info["model_name"],
+                model = LLM(
+                    model=model_info["path"],  # 使用本地路径
+                    trust_remote_code=True,
+                    max_model_len=model_config["max_model_len"],
+                    max_num_seqs=model_config["max_num_seqs"],
+                    gpu_memory_utilization=model_config["gpu_memory_utilization"],
+                    tensor_parallel_size=model_config["tensor_parallel_size"],
+                    dtype=model_config["dtype"],
+                    mm_processor_kwargs=model_config.get("mm_processor_kwargs")
+                )
+                
+                # 加载tokenizer或processor
+                if model_type == 'vl':
+                    tokenizer = AutoProcessor.from_pretrained(
+                        model_info["path"],
                         trust_remote_code=True
                     )
-                    self.loaded_processors[model_name] = processor
+                else:
+                    tokenizer = AutoTokenizer.from_pretrained(
+                        model_info["path"],
+                        trust_remote_code=True
+                    )
                 
+                self.current_model = model
+                self.current_tokenizer = tokenizer
                 self.current_model_name = model_name
+                self.model_type = model_type
                 
-            # 返回单个对象而不是元组
-            return self.loaded_models[model_name], self.loaded_processors[model_name]
+            return self.current_model, self.current_tokenizer
             
         except Exception as e:
-            logging.error(f"Error loading VL model {model_name}: {str(e)}")
+            logging.error(f"Error loading model {model_name}: {str(e)}")
             raise
 
-    def get_available_models(self):
-        """获取可用的模型列表"""
-        return list(VL_MODELS.keys())
+    def cleanup(self):
+        """清理资源"""
+        self._clear_gpu_memory()
 
 # 创建全局实例
 model_manager = ModelManager()
