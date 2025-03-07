@@ -19,5 +19,6 @@ if __name__ == "__main__":
     logging.info(f"Launching Gradio interface on {GRADIO_SERVER_HOST}:{GRADIO_SERVER_PORT}")
     iface.launch(
         server_name=GRADIO_SERVER_HOST,
-        server_port=GRADIO_SERVER_PORT
+        server_port=GRADIO_SERVER_PORT,
+        share=True  # 添加这个参数可以生成公共链接
     )
